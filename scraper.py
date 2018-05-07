@@ -17,9 +17,9 @@ class scraper_stock(object):
         
         Args:
             website_url : ex:'https://stock.wearn.com/netbuy.asp?Year={}&month={}&kind={}'
-            year:
-            month:
-            stock_num
+            year: The year of the "Republic Era"  ex:107
+            month: ex:05
+            stock_num : ex:0050
             
         Retrun:
             data: pandas datafram
@@ -71,7 +71,7 @@ class scraper_stock(object):
                     break
         pd_table = pd.concat(data_list)
         
-        
+#        pd_table=pd_table.drop_duplicates(pd_table,keep='first')
         return pd_table
         
         
@@ -80,11 +80,11 @@ class scraper_stock(object):
         fetch stock common data from website
         
         Args:
-            start_date:
-            end_date:
+            start_date:a list format ex:[105,3]
+            end_date:a list format ex:[106,3]
         
         Return:
-            data: pandas data fram
+            data: pandas data frame
         """
         start_year = str(start_date[0] + 1911)
         start_month = str(start_date[1]).zfill(2) 
@@ -103,6 +103,7 @@ class scraper_stock(object):
         change_data_format = lambda m: str(int(m.group(0))-1911)    
         data.iloc[:,0]=data.iloc[:,0].str.replace(r'\d+', change_data_format,1)
         
+#        data=data.drop_duplicates(data,keep='first')
         return data
         
     
@@ -110,11 +111,11 @@ class scraper_stock(object):
         """
         Combine all stock information together
         Args:
-            start_date:
-            end_date:
+            start_date:a list format ex:[105,3]
+            end_date:a list format ex:[106,3]
         
         Return:
-            data: pandas data fram
+            data: pandas data frame
             
         """
         
@@ -122,33 +123,38 @@ class scraper_stock(object):
         website_url='https://stock.wearn.com/netbuy.asp?Year={}&month={}&kind={}'
         three_buy_table=self.fetch_range_period(website_url,stock_code,start_date,end_date)
         three_buy_table.columns=[u'日期', u"自營商",u"投信",u"外資"]
-        three_buy_table.to_csv("stock.csv",encoding="utf_8_sig")
+#        three_buy_table.to_csv("stock.csv",encoding="utf_8_sig")
         print (three_buy_table)
         
         
         website_url='https://stock.wearn.com/acredit.asp?year={}&month={}&kind={}'
         people_table=self.fetch_range_period(website_url,stock_code,start_date,end_date)
         people_table.columns=[u'日期', u"資餘",u"資增減",u"券餘",u"券增減",u"使用率",u"券資比",u"資券抵"]
-        people_table.to_csv("margin_trading.csv",encoding="utf_8_sig")
+#        people_table.to_csv("margin_trading.csv",encoding="utf_8_sig")
         print (people_table)
         
         common_table = self.fatch_common(stock_code,start_date,end_date)
         common_table.columns=[u'日期', u"開盤價",u"最高價",u"最低價",u"收盤價",u"漲跌",u"漲%",u"成交量",u"成交金額",u"本益比"]
-        common_table.to_csv("common.csv",encoding="utf_8_sig")
+#        common_table.to_csv("common.csv",encoding="utf_8_sig")
         print (common_table)
         
         temp_table = pd.merge(left=three_buy_table,right=people_table)
         all_table = pd.merge(left=temp_table,right= common_table, on = "日期")
         
-        all_table.to_csv("{}.csv".format(stock_code),encoding="utf_8_sig")
+        all_table=all_table.drop_duplicates(all_table,keep='first')
+        all_table.to_csv("stock_csv/{}.csv".format(stock_code),encoding="utf_8_sig")
+        
+        return all_table
 
-stock_code = "0050"
-start_date = [107,2]
-end_date = [107,3]
+stock_code_list = ["0050","0051","0052","0053","0054","0055","0056","0057","0058","0059",
+                   "006201","006203","006204","006208","00690","00692","00701","00713"]
+stock_code = "0051"
+start_date = [106,5]
+end_date = [107,5]
 
 
+for stock_code in stock_code_list:
 
-
-scraper_stock().get_whole_stock_data(stock_code,start_date,end_date)
+    scraper_stock().get_whole_stock_data(stock_code,start_date,end_date)
 #data = pd.read_csv("stock.csv")
 #print (data)

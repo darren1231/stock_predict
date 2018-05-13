@@ -148,13 +148,13 @@ class scraper_stock(object):
 
 stock_code_list = ["0050","0051","0052","0053","0054","0055","0056","0057","0058","0059",
                    "006201","006203","006204","006208","00690","00692","00701","00713"]
-stock_code = "0051"
-start_date = [106,5]
+stock_code = "0050"
+start_date = [92,5]
 end_date = [107,5]
 
 
-for stock_code in stock_code_list:
+#for stock_code in stock_code_list:
 
-    scraper_stock().get_whole_stock_data(stock_code,start_date,end_date)
+scraper_stock().get_whole_stock_data(stock_code,start_date,end_date)
 #data = pd.read_csv("stock.csv")
 #print (data)
